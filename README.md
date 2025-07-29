@@ -1,36 +1,31 @@
-# punktozaur - Zadanie 2.1
+## Zadanie: Wdrożenie CQRS podejścia command-handler z wykorzystaniem wzorca Mediator w domenie **Coupon**
 
-Zaimplementuj testy kontraktowe dla komunikacji po REST API.
+### Cel
 
-## Przygotowanie
+Zaimplementuj architektoniczny wzorzec **CQRS** w domenie `Coupon`, wykorzystując wzorzec **Mediator** w taki sposób, aby:
+* [CouponController](src/main/java/pl/punktozaur/coupon/web/CouponController.java) tworzył **komendy (command)** i przesyłał je do **Mediatora**,
+* **Mediator** przekazywał komendy do odpowiednich **Command Handlerów**.
 
-W plikach `pom.xml` zostały już dodane zależności i konfiguracja dla testów kontraktowych, więc nie musisz nic tam zmieniać.
+Przykładową implementację znajdziesz w projekcie `kopytka`, na branchu `cqrs-command-handler`.
 
-## Implementacja
+---
 
-Na start zaimplementuj [ContractTestBase](./loyalty-service/src/test/java/pl/punktozaur/loyalty/contracts/ContractTestBase.java).
-Definiuje jak aplikacja ma odpowiadać na żądania opisane w kontraktach.
+### Obecny stan
 
-Następnie utwórz kontrakty.
+W projekcie istnieje już wstępna implementacja CQRS:
+* [CouponService](src/main/java/pl/punktozaur/coupon/application/CouponService.java) odpowiada za operacje **zmieniające stan**,
+* [CouponQueryService](src/main/java/pl/punktozaur/coupon/application/CouponQueryService.java) odpowiada za **operacje odczytu**.
 
-## Kontrakty
-`loyalty-service` wystawia API, z którego korzystają `coupon-service` i `customer-service`.
-Kontrakty (np. w formacie `.groovy`) będą znajdować się w `loyalty-service`.
+Twoim zadaniem jest **przeniesienie logiki modyfikującej stan** z `CouponService` do dedykowanych **Command Handlerów** i zmiany podejścia w kontrolerze.
 
-Na podstawie kontraktów, w `loyalty-service` generowany są automatycznie testy po stornie providera i plik `.stubs.jar`, który trafia do katalogu `target`.
-Konsumenci, czyli `coupon-service` i `customer-service`, definiują testy integracyjne, które korzystają z wygenerowanych stubów (`.stubs.jar`) z `loyalty-service`.
-Dzięki temu mogą upewnić się, że ich implementacja klienta jest zgodna z wymaganiami opisanymi w kontrakcie.
+### Wskazówki
+* W projekcie znajdują się już klasy wspierające Mediatora w pakiecie [common.command](src/main/java/pl/punktozaur/common/command).
+* Po wprowadzeniu zmian, `CouponService` powinien być **usunięty** z projektu.
+* W testach architektury ([ArchitectureTest](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java)) weryfikowana jest reguła, że `CouponController` **nie może zależeć od `CouponService`**.
+* Zachowanie aplikacji (request/response) **nie powinno się zmienić** po refaktoryzacji.
+* W testach może być konieczne:
+    * dostosowanie DTO wykorzystywanych w metodach pomocniczych,
+    * zamiana wywołań serwisów na wywołania handlerów.
 
-## Uwagi techniczne
+**Powodzenia!**
 
-Jeśli robisz `@AutoConfigureStubRunner` podając nazwę `stubs` to odwołujesz się do jar z innego mikroserwisu, on musi istnieć.
-Wcześniej w mikroserwisie, który ma go stworzyć, możesz użyć komendy `maven install`.
-
-
-## Weryfikacja
-
-Po implementacji kontraktów zweryfikuj ich działanie:
-- Zmieniając nazwę jakiegoś pola u dostawcy - test powinien się wysypać
-- Zmieniając nazwę pola u odbiorcy - test powinien się wysypać
-
-### Powodzenia!
