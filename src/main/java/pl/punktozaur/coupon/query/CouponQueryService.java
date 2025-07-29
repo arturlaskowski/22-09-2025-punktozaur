@@ -1,13 +1,10 @@
-package pl.punktozaur.coupon.application;
+package pl.punktozaur.coupon.query;
 
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import pl.punktozaur.coupon.application.dto.CouponDto;
-import pl.punktozaur.coupon.application.exception.CouponNotFoundException;
-import pl.punktozaur.coupon.application.repository.CouponQueryRepository;
+import pl.punktozaur.coupon.command.CouponNotFoundException;
 import pl.punktozaur.coupon.domain.CouponId;
 
 @Service
@@ -15,11 +12,10 @@ import pl.punktozaur.coupon.domain.CouponId;
 @Slf4j
 public class CouponQueryService {
 
-    private final CouponQueryRepository couponQueryRepository;
+    private final CouponQueryRepository couponRepository;
 
-    @Transactional(readOnly = true)
     public CouponDto getCoupon(CouponId id) {
-        var coupon = couponQueryRepository.findById(id)
+        var coupon = couponRepository.findById(id)
                 .orElseThrow(() -> new CouponNotFoundException(id));
 
         return new CouponDto(coupon.getId().id(), coupon.getLoyaltyAccountId().id(),

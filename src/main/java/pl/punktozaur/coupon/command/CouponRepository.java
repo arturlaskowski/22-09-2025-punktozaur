@@ -1,4 +1,4 @@
-package pl.punktozaur.coupon.application.repository;
+package pl.punktozaur.coupon.command;
 
 import org.springframework.data.repository.CrudRepository;
 import pl.punktozaur.coupon.domain.Coupon;
