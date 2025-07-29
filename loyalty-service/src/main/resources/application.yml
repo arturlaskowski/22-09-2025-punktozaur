@@ -24,6 +24,7 @@ loyalty-service:
     group-id: loyalty-topic-consumer
     topics:
       customer-event: customer-events
+      loyalty-command: loyalty-commands
 
 kafka-config:
   bootstrap-servers: localhost:9092
