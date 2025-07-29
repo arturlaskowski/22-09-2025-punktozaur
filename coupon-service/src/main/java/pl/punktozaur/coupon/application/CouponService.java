@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.punktozaur.common.domain.LoyaltyAccountId;
 import pl.punktozaur.coupon.application.dto.CouponDto;
 import pl.punktozaur.coupon.application.dto.CreateCouponDto;
 import pl.punktozaur.coupon.application.dto.RedeemCouponDto;
@@ -13,6 +12,7 @@ import pl.punktozaur.coupon.application.exception.CouponNotFoundException;
 import pl.punktozaur.coupon.application.repository.CouponRepository;
 import pl.punktozaur.coupon.domain.Coupon;
 import pl.punktozaur.coupon.domain.CouponId;
+import pl.punktozaur.common.domain.LoyaltyAccountId;
 
 @Service
 @AllArgsConstructor
@@ -20,16 +20,27 @@ import pl.punktozaur.coupon.domain.CouponId;
 public class CouponService {
 
     private final CouponRepository couponRepository;
-    private final SubtractPointsCommandPublisher subtractPointsCommandPublisher;
+    private final LoyaltyAccountCommandPublisher loyaltyAccountCommandPublisher;
 
     @Transactional
     public CouponId createCoupon(CreateCouponDto dto) {
         var loyaltyAccountId = new LoyaltyAccountId(dto.loyaltyAccountId());
         var coupon = new Coupon(loyaltyAccountId, dto.nominalValue());
+        var couponId = couponRepository.save(coupon).getId();
         var points = coupon.getNominalValue().getRequiredPoints();
-        subtractPointsCommandPublisher.publishSubtractPointsCommand(loyaltyAccountId, points);
-        couponRepository.save(coupon);
-        return coupon.getId();
+        loyaltyAccountCommandPublisher.publishSubtractPointsCommand(loyaltyAccountId, points);
+
+        log.info("Coupon {} created", couponId.id());
+        return couponId;
+    }
+
+    @Transactional
+    public void activeCoupon(CouponId couponId) {
+        var coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
+        coupon.active();
+
+        log.info("Coupon {} activated", couponId.id());
     }
 
     @Transactional
@@ -46,6 +57,6 @@ public class CouponService {
                 .orElseThrow(() -> new CouponNotFoundException(id));
 
         return new CouponDto(coupon.getId().id(), coupon.getLoyaltyAccountId().id(),
-                coupon.getNominalValue(), coupon.isActive());
+                coupon.getNominalValue(), coupon.getStatus(), coupon.getFailureMessage());
     }
 }

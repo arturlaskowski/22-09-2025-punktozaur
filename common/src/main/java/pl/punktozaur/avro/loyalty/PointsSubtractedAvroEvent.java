@@ -12,11 +12,11 @@ import org.apache.avro.message.BinaryMessageDecoder;
 import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
-public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 8861911843551693860L;
+public class PointsSubtractedAvroEvent extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+  private static final long serialVersionUID = 2736693341711279016L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"SubtractPointsCommandAvroModel\",\"namespace\":\"pl.punktozaur.avro.loyalty\",\"fields\":[{\"name\":\"loyaltyAccountId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"points\",\"type\":\"int\"},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PointsSubtractedAvroEvent\",\"namespace\":\"pl.punktozaur.avro.loyalty\",\"fields\":[{\"name\":\"sagaId\",\"type\":[\"null\",{\"type\":\"string\",\"logicalType\":\"uuid\"}]},{\"name\":\"loyaltyAccountId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"points\",\"type\":\"int\"},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -25,17 +25,17 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
     MODEL$.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
   }
 
-  private static final BinaryMessageEncoder<SubtractPointsCommandAvroModel> ENCODER =
+  private static final BinaryMessageEncoder<PointsSubtractedAvroEvent> ENCODER =
       new BinaryMessageEncoder<>(MODEL$, SCHEMA$);
 
-  private static final BinaryMessageDecoder<SubtractPointsCommandAvroModel> DECODER =
+  private static final BinaryMessageDecoder<PointsSubtractedAvroEvent> DECODER =
       new BinaryMessageDecoder<>(MODEL$, SCHEMA$);
 
   /**
    * Return the BinaryMessageEncoder instance used by this class.
    * @return the message encoder used by this class
    */
-  public static BinaryMessageEncoder<SubtractPointsCommandAvroModel> getEncoder() {
+  public static BinaryMessageEncoder<PointsSubtractedAvroEvent> getEncoder() {
     return ENCODER;
   }
 
@@ -43,7 +43,7 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
    * Return the BinaryMessageDecoder instance used by this class.
    * @return the message decoder used by this class
    */
-  public static BinaryMessageDecoder<SubtractPointsCommandAvroModel> getDecoder() {
+  public static BinaryMessageDecoder<PointsSubtractedAvroEvent> getDecoder() {
     return DECODER;
   }
 
@@ -52,12 +52,12 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
    * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
    * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
-  public static BinaryMessageDecoder<SubtractPointsCommandAvroModel> createDecoder(SchemaStore resolver) {
+  public static BinaryMessageDecoder<PointsSubtractedAvroEvent> createDecoder(SchemaStore resolver) {
     return new BinaryMessageDecoder<>(MODEL$, SCHEMA$, resolver);
   }
 
   /**
-   * Serializes this SubtractPointsCommandAvroModel to a ByteBuffer.
+   * Serializes this PointsSubtractedAvroEvent to a ByteBuffer.
    * @return a buffer holding the serialized data for this instance
    * @throws java.io.IOException if this instance could not be serialized
    */
@@ -66,16 +66,17 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   }
 
   /**
-   * Deserializes a SubtractPointsCommandAvroModel from a ByteBuffer.
+   * Deserializes a PointsSubtractedAvroEvent from a ByteBuffer.
    * @param b a byte buffer holding serialized data for an instance of this class
-   * @return a SubtractPointsCommandAvroModel instance decoded from the given buffer
+   * @return a PointsSubtractedAvroEvent instance decoded from the given buffer
    * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
    */
-  public static SubtractPointsCommandAvroModel fromByteBuffer(
+  public static PointsSubtractedAvroEvent fromByteBuffer(
       java.nio.ByteBuffer b) throws java.io.IOException {
     return DECODER.decode(b);
   }
 
+  private java.util.UUID sagaId;
   private java.util.UUID loyaltyAccountId;
   private int points;
   private java.time.Instant createdAt;
@@ -85,15 +86,17 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
    * to their default values from the schema.  If that is desired then
    * one should use <code>newBuilder()</code>.
    */
-  public SubtractPointsCommandAvroModel() {}
+  public PointsSubtractedAvroEvent() {}
 
   /**
    * All-args constructor.
+   * @param sagaId The new value for sagaId
    * @param loyaltyAccountId The new value for loyaltyAccountId
    * @param points The new value for points
    * @param createdAt The new value for createdAt
    */
-  public SubtractPointsCommandAvroModel(java.util.UUID loyaltyAccountId, java.lang.Integer points, java.time.Instant createdAt) {
+  public PointsSubtractedAvroEvent(java.util.UUID sagaId, java.util.UUID loyaltyAccountId, java.lang.Integer points, java.time.Instant createdAt) {
+    this.sagaId = sagaId;
     this.loyaltyAccountId = loyaltyAccountId;
     this.points = points;
     this.createdAt = createdAt.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
@@ -109,15 +112,17 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   @Override
   public java.lang.Object get(int field$) {
     switch (field$) {
-    case 0: return loyaltyAccountId;
-    case 1: return points;
-    case 2: return createdAt;
+    case 0: return sagaId;
+    case 1: return loyaltyAccountId;
+    case 2: return points;
+    case 3: return createdAt;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
   private static final org.apache.avro.Conversion<?>[] conversions =
       new org.apache.avro.Conversion<?>[] {
+      null,
       new org.apache.avro.Conversions.UUIDConversion(),
       null,
       new org.apache.avro.data.TimeConversions.TimestampMillisConversion(),
@@ -134,11 +139,29 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: loyaltyAccountId = (java.util.UUID)value$; break;
-    case 1: points = (java.lang.Integer)value$; break;
-    case 2: createdAt = (java.time.Instant)value$; break;
+    case 0: sagaId = (java.util.UUID)value$; break;
+    case 1: loyaltyAccountId = (java.util.UUID)value$; break;
+    case 2: points = (java.lang.Integer)value$; break;
+    case 3: createdAt = (java.time.Instant)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
+  }
+
+  /**
+   * Gets the value of the 'sagaId' field.
+   * @return The value of the 'sagaId' field.
+   */
+  public java.util.UUID getSagaId() {
+    return sagaId;
+  }
+
+
+  /**
+   * Sets the value of the 'sagaId' field.
+   * @param value the value to set.
+   */
+  public void setSagaId(java.util.UUID value) {
+    this.sagaId = value;
   }
 
   /**
@@ -193,46 +216,47 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   }
 
   /**
-   * Creates a new SubtractPointsCommandAvroModel RecordBuilder.
-   * @return A new SubtractPointsCommandAvroModel RecordBuilder
+   * Creates a new PointsSubtractedAvroEvent RecordBuilder.
+   * @return A new PointsSubtractedAvroEvent RecordBuilder
    */
-  public static pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder newBuilder() {
-    return new pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder();
+  public static pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder newBuilder() {
+    return new pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder();
   }
 
   /**
-   * Creates a new SubtractPointsCommandAvroModel RecordBuilder by copying an existing Builder.
+   * Creates a new PointsSubtractedAvroEvent RecordBuilder by copying an existing Builder.
    * @param other The existing builder to copy.
-   * @return A new SubtractPointsCommandAvroModel RecordBuilder
+   * @return A new PointsSubtractedAvroEvent RecordBuilder
    */
-  public static pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder newBuilder(pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder other) {
+  public static pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder newBuilder(pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder other) {
     if (other == null) {
-      return new pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder();
+      return new pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder();
     } else {
-      return new pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder(other);
+      return new pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder(other);
     }
   }
 
   /**
-   * Creates a new SubtractPointsCommandAvroModel RecordBuilder by copying an existing SubtractPointsCommandAvroModel instance.
+   * Creates a new PointsSubtractedAvroEvent RecordBuilder by copying an existing PointsSubtractedAvroEvent instance.
    * @param other The existing instance to copy.
-   * @return A new SubtractPointsCommandAvroModel RecordBuilder
+   * @return A new PointsSubtractedAvroEvent RecordBuilder
    */
-  public static pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder newBuilder(pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel other) {
+  public static pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder newBuilder(pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent other) {
     if (other == null) {
-      return new pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder();
+      return new pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder();
     } else {
-      return new pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder(other);
+      return new pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder(other);
     }
   }
 
   /**
-   * RecordBuilder for SubtractPointsCommandAvroModel instances.
+   * RecordBuilder for PointsSubtractedAvroEvent instances.
    */
   @org.apache.avro.specific.AvroGenerated
-  public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<SubtractPointsCommandAvroModel>
-    implements org.apache.avro.data.RecordBuilder<SubtractPointsCommandAvroModel> {
+  public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<PointsSubtractedAvroEvent>
+    implements org.apache.avro.data.RecordBuilder<PointsSubtractedAvroEvent> {
 
+    private java.util.UUID sagaId;
     private java.util.UUID loyaltyAccountId;
     private int points;
     private java.time.Instant createdAt;
@@ -246,40 +270,88 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder other) {
+    private Builder(pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder other) {
       super(other);
-      if (isValidValue(fields()[0], other.loyaltyAccountId)) {
-        this.loyaltyAccountId = data().deepCopy(fields()[0].schema(), other.loyaltyAccountId);
+      if (isValidValue(fields()[0], other.sagaId)) {
+        this.sagaId = data().deepCopy(fields()[0].schema(), other.sagaId);
         fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
-      if (isValidValue(fields()[1], other.points)) {
-        this.points = data().deepCopy(fields()[1].schema(), other.points);
+      if (isValidValue(fields()[1], other.loyaltyAccountId)) {
+        this.loyaltyAccountId = data().deepCopy(fields()[1].schema(), other.loyaltyAccountId);
         fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
-      if (isValidValue(fields()[2], other.createdAt)) {
-        this.createdAt = data().deepCopy(fields()[2].schema(), other.createdAt);
+      if (isValidValue(fields()[2], other.points)) {
+        this.points = data().deepCopy(fields()[2].schema(), other.points);
         fieldSetFlags()[2] = other.fieldSetFlags()[2];
+      }
+      if (isValidValue(fields()[3], other.createdAt)) {
+        this.createdAt = data().deepCopy(fields()[3].schema(), other.createdAt);
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
     }
 
     /**
-     * Creates a Builder by copying an existing SubtractPointsCommandAvroModel instance
+     * Creates a Builder by copying an existing PointsSubtractedAvroEvent instance
      * @param other The existing instance to copy.
      */
-    private Builder(pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel other) {
+    private Builder(pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent other) {
       super(SCHEMA$, MODEL$);
-      if (isValidValue(fields()[0], other.loyaltyAccountId)) {
-        this.loyaltyAccountId = data().deepCopy(fields()[0].schema(), other.loyaltyAccountId);
+      if (isValidValue(fields()[0], other.sagaId)) {
+        this.sagaId = data().deepCopy(fields()[0].schema(), other.sagaId);
         fieldSetFlags()[0] = true;
       }
-      if (isValidValue(fields()[1], other.points)) {
-        this.points = data().deepCopy(fields()[1].schema(), other.points);
+      if (isValidValue(fields()[1], other.loyaltyAccountId)) {
+        this.loyaltyAccountId = data().deepCopy(fields()[1].schema(), other.loyaltyAccountId);
         fieldSetFlags()[1] = true;
       }
-      if (isValidValue(fields()[2], other.createdAt)) {
-        this.createdAt = data().deepCopy(fields()[2].schema(), other.createdAt);
+      if (isValidValue(fields()[2], other.points)) {
+        this.points = data().deepCopy(fields()[2].schema(), other.points);
         fieldSetFlags()[2] = true;
       }
+      if (isValidValue(fields()[3], other.createdAt)) {
+        this.createdAt = data().deepCopy(fields()[3].schema(), other.createdAt);
+        fieldSetFlags()[3] = true;
+      }
+    }
+
+    /**
+      * Gets the value of the 'sagaId' field.
+      * @return The value.
+      */
+    public java.util.UUID getSagaId() {
+      return sagaId;
+    }
+
+
+    /**
+      * Sets the value of the 'sagaId' field.
+      * @param value The value of 'sagaId'.
+      * @return This builder.
+      */
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder setSagaId(java.util.UUID value) {
+      validate(fields()[0], value);
+      this.sagaId = value;
+      fieldSetFlags()[0] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'sagaId' field has been set.
+      * @return True if the 'sagaId' field has been set, false otherwise.
+      */
+    public boolean hasSagaId() {
+      return fieldSetFlags()[0];
+    }
+
+
+    /**
+      * Clears the value of the 'sagaId' field.
+      * @return This builder.
+      */
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder clearSagaId() {
+      sagaId = null;
+      fieldSetFlags()[0] = false;
+      return this;
     }
 
     /**
@@ -296,10 +368,10 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @param value The value of 'loyaltyAccountId'.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder setLoyaltyAccountId(java.util.UUID value) {
-      validate(fields()[0], value);
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder setLoyaltyAccountId(java.util.UUID value) {
+      validate(fields()[1], value);
       this.loyaltyAccountId = value;
-      fieldSetFlags()[0] = true;
+      fieldSetFlags()[1] = true;
       return this;
     }
 
@@ -308,7 +380,7 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @return True if the 'loyaltyAccountId' field has been set, false otherwise.
       */
     public boolean hasLoyaltyAccountId() {
-      return fieldSetFlags()[0];
+      return fieldSetFlags()[1];
     }
 
 
@@ -316,9 +388,9 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * Clears the value of the 'loyaltyAccountId' field.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder clearLoyaltyAccountId() {
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder clearLoyaltyAccountId() {
       loyaltyAccountId = null;
-      fieldSetFlags()[0] = false;
+      fieldSetFlags()[1] = false;
       return this;
     }
 
@@ -336,10 +408,10 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @param value The value of 'points'.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder setPoints(int value) {
-      validate(fields()[1], value);
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder setPoints(int value) {
+      validate(fields()[2], value);
       this.points = value;
-      fieldSetFlags()[1] = true;
+      fieldSetFlags()[2] = true;
       return this;
     }
 
@@ -348,7 +420,7 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @return True if the 'points' field has been set, false otherwise.
       */
     public boolean hasPoints() {
-      return fieldSetFlags()[1];
+      return fieldSetFlags()[2];
     }
 
 
@@ -356,8 +428,8 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * Clears the value of the 'points' field.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder clearPoints() {
-      fieldSetFlags()[1] = false;
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder clearPoints() {
+      fieldSetFlags()[2] = false;
       return this;
     }
 
@@ -375,10 +447,10 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @param value The value of 'createdAt'.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder setCreatedAt(java.time.Instant value) {
-      validate(fields()[2], value);
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder setCreatedAt(java.time.Instant value) {
+      validate(fields()[3], value);
       this.createdAt = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
-      fieldSetFlags()[2] = true;
+      fieldSetFlags()[3] = true;
       return this;
     }
 
@@ -387,7 +459,7 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * @return True if the 'createdAt' field has been set, false otherwise.
       */
     public boolean hasCreatedAt() {
-      return fieldSetFlags()[2];
+      return fieldSetFlags()[3];
     }
 
 
@@ -395,19 +467,20 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
       * Clears the value of the 'createdAt' field.
       * @return This builder.
       */
-    public pl.punktozaur.avro.loyalty.SubtractPointsCommandAvroModel.Builder clearCreatedAt() {
-      fieldSetFlags()[2] = false;
+    public pl.punktozaur.avro.loyalty.PointsSubtractedAvroEvent.Builder clearCreatedAt() {
+      fieldSetFlags()[3] = false;
       return this;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public SubtractPointsCommandAvroModel build() {
+    public PointsSubtractedAvroEvent build() {
       try {
-        SubtractPointsCommandAvroModel record = new SubtractPointsCommandAvroModel();
-        record.loyaltyAccountId = fieldSetFlags()[0] ? this.loyaltyAccountId : (java.util.UUID) defaultValue(fields()[0]);
-        record.points = fieldSetFlags()[1] ? this.points : (java.lang.Integer) defaultValue(fields()[1]);
-        record.createdAt = fieldSetFlags()[2] ? this.createdAt : (java.time.Instant) defaultValue(fields()[2]);
+        PointsSubtractedAvroEvent record = new PointsSubtractedAvroEvent();
+        record.sagaId = fieldSetFlags()[0] ? this.sagaId : (java.util.UUID) defaultValue(fields()[0]);
+        record.loyaltyAccountId = fieldSetFlags()[1] ? this.loyaltyAccountId : (java.util.UUID) defaultValue(fields()[1]);
+        record.points = fieldSetFlags()[2] ? this.points : (java.lang.Integer) defaultValue(fields()[2]);
+        record.createdAt = fieldSetFlags()[3] ? this.createdAt : (java.time.Instant) defaultValue(fields()[3]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -418,8 +491,8 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   }
 
   @SuppressWarnings("unchecked")
-  private static final org.apache.avro.io.DatumWriter<SubtractPointsCommandAvroModel>
-    WRITER$ = (org.apache.avro.io.DatumWriter<SubtractPointsCommandAvroModel>)MODEL$.createDatumWriter(SCHEMA$);
+  private static final org.apache.avro.io.DatumWriter<PointsSubtractedAvroEvent>
+    WRITER$ = (org.apache.avro.io.DatumWriter<PointsSubtractedAvroEvent>)MODEL$.createDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
     throws java.io.IOException {
@@ -427,8 +500,8 @@ public class SubtractPointsCommandAvroModel extends org.apache.avro.specific.Spe
   }
 
   @SuppressWarnings("unchecked")
-  private static final org.apache.avro.io.DatumReader<SubtractPointsCommandAvroModel>
-    READER$ = (org.apache.avro.io.DatumReader<SubtractPointsCommandAvroModel>)MODEL$.createDatumReader(SCHEMA$);
+  private static final org.apache.avro.io.DatumReader<PointsSubtractedAvroEvent>
+    READER$ = (org.apache.avro.io.DatumReader<PointsSubtractedAvroEvent>)MODEL$.createDatumReader(SCHEMA$);
 
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {

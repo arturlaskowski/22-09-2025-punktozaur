@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class Zad5EndToEndTest {
+class SagaEndToEndTest {
 
     @LocalServerPort
     private int port;
@@ -27,7 +27,7 @@ class Zad5EndToEndTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final Duration ASYNC_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration ASYNC_TIMEOUT = Duration.ofSeconds(30);
     private static final Duration RETRY_DELAY = Duration.ofSeconds(1);
 
     @Test
@@ -42,7 +42,7 @@ class Zad5EndToEndTest {
             7. Verify loyalty account has 100 points (200 - 100)
             8. Verify coupon status is ACTIVE
             """)
-    void endToEndTest() {
+    void sagaPatternHappyPathTest() {
         // Step 1: Create customer
         String uniqueEmail = generateUniqueEmail();
         String createCustomerRequestBody = """
@@ -93,7 +93,7 @@ class Zad5EndToEndTest {
 
         JsonNode loyaltyAccount = loyaltyAccountsArray.get(0);
         assertThat(loyaltyAccount.get("customerId").asText()).isEqualTo(customerId);
-        assertThat(loyaltyAccount.get("points").asInt()).isZero();
+        assertThat(loyaltyAccount.get("points").asInt()).isEqualTo(0);
 
         String loyaltyAccountId = loyaltyAccount.get("id").asText();
 
@@ -175,9 +175,133 @@ class Zad5EndToEndTest {
         assertThat(couponResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         JsonNode coupon = parseJson(couponResponse.getBody());
-        assertThat(coupon.get("isActive").asText()).isEqualTo("true");
+        assertThat(coupon.get("status").asText()).isEqualTo("ACTIVE");
         assertThat(coupon.get("loyaltyAccountId").asText()).isEqualTo(loyaltyAccountId);
         assertThat(coupon.get("nominalValue").asText()).isEqualTo("TEN");
+    }
+
+    @Test
+    @DisplayName("""
+            Full integration test:
+            1. Create customer
+            2. Wait for loyalty account creation (async via Kafka)
+            3. Verify loyalty account exists
+            4. Create TEN coupon (100 points required) -> Not enough points
+            5. Wait for event from Loyalty Service
+            6. Verify coupon status is REJECTED
+            """)
+    void compensationSagaPatternTest() {
+        // Step 1: Create customer
+        String uniqueEmail = generateUniqueEmail();
+        String createCustomerRequestBody = """
+                {
+                  "firstName": "Jane",
+                  "lastName": "Smith",
+                  "email": "%s"
+                }
+                """.formatted(uniqueEmail);
+
+        ResponseEntity<Void> createCustomerResponse = restTemplate.postForEntity(
+                getCustomerServiceUrl() + "/customers",
+                createJsonHttpEntity(createCustomerRequestBody),
+                Void.class);
+
+        assertThat(createCustomerResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createCustomerResponse.getHeaders().getLocation()).isNotNull();
+
+        String customerId = extractIdFromLocation(createCustomerResponse.getHeaders().getLocation().getPath());
+
+        // Step 2: Wait for loyalty account creation via Kafka (asynchronous)
+        await("Loyalty account creation via Kafka")
+                .atMost(ASYNC_TIMEOUT)
+                .pollDelay(RETRY_DELAY)
+                .pollInterval(RETRY_DELAY)
+                .untilAsserted(() -> {
+                    ResponseEntity<String> loyaltyAccountsResponse = restTemplate.getForEntity(
+                            getLoyaltyServiceUrl() + "/loyalty-accounts?customerId=" + customerId,
+                            String.class);
+
+                    assertThat(loyaltyAccountsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+                    JsonNode loyaltyAccountsArray = parseJson(loyaltyAccountsResponse.getBody());
+                    assertThat(loyaltyAccountsArray.isArray()).isTrue();
+                    assertThat(loyaltyAccountsArray.size()).isGreaterThan(0);
+                });
+
+        // Step 3: Retrieve and verify loyalty account (with 0 points - no points added)
+        ResponseEntity<String> loyaltyAccountsResponse = restTemplate.getForEntity(
+                getLoyaltyServiceUrl() + "/loyalty-accounts?customerId=" + customerId,
+                String.class);
+
+        assertThat(loyaltyAccountsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JsonNode loyaltyAccountsArray = parseJson(loyaltyAccountsResponse.getBody());
+        assertThat(loyaltyAccountsArray.isArray()).isTrue();
+        assertThat(loyaltyAccountsArray.size()).isEqualTo(1);
+
+        JsonNode loyaltyAccount = loyaltyAccountsArray.get(0);
+        assertThat(loyaltyAccount.get("customerId").asText()).isEqualTo(customerId);
+        assertThat(loyaltyAccount.get("points").asInt()).isEqualTo(0);
+
+        String loyaltyAccountId = loyaltyAccount.get("id").asText();
+
+        // Step 4: Create TEN coupon (requires 100 points but account has 0 points)
+        String createCouponRequestBody = """
+                {
+                  "loyaltyAccountId": "%s",
+                  "nominalValue": "TEN"
+                }
+                """.formatted(loyaltyAccountId);
+
+        ResponseEntity<Void> createCouponResponse = restTemplate.postForEntity(
+                getCouponServiceUrl() + "/coupons",
+                createJsonHttpEntity(createCouponRequestBody),
+                Void.class);
+
+        assertThat(createCouponResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(createCouponResponse.getHeaders().getLocation()).isNotNull();
+
+        String couponId = extractIdFromLocation(createCouponResponse.getHeaders().getLocation().getPath());
+
+        // Step 5: Wait for compensation event from Loyalty Service (insufficient points)
+        await("Coupon compensation via Kafka due to insufficient points")
+                .atMost(ASYNC_TIMEOUT)
+                .pollDelay(RETRY_DELAY)
+                .pollInterval(RETRY_DELAY)
+                .untilAsserted(() -> {
+                    ResponseEntity<String> couponResponse = restTemplate.getForEntity(
+                            getCouponServiceUrl() + "/coupons/" + couponId,
+                            String.class);
+
+                    assertThat(couponResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+                    JsonNode coupon = parseJson(couponResponse.getBody());
+                    assertThat(coupon.get("status").asText()).isEqualTo("REJECTED");
+                });
+
+        // Step 6: Final verification - coupon status should be REJECTED
+        ResponseEntity<String> finalCouponResponse = restTemplate.getForEntity(
+                getCouponServiceUrl() + "/coupons/" + couponId,
+                String.class);
+
+        assertThat(finalCouponResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JsonNode finalCoupon = parseJson(finalCouponResponse.getBody());
+        assertThat(finalCoupon.get("status").asText()).isEqualTo("REJECTED");
+        assertThat(finalCoupon.get("loyaltyAccountId").asText()).isEqualTo(loyaltyAccountId);
+        assertThat(finalCoupon.get("nominalValue").asText()).isEqualTo("TEN");
+        assertThat(finalCoupon.get("nominalValue").asText()).isEqualTo("TEN");
+        assertThat(finalCoupon.get("failureMessage").asText()).isNotNull();
+
+        // Verify loyalty account still has 0 points (no points were deducted)
+        ResponseEntity<String> finalLoyaltyAccountResponse = restTemplate.getForEntity(
+                getLoyaltyServiceUrl() + "/loyalty-accounts/" + loyaltyAccountId,
+                String.class);
+
+        assertThat(finalLoyaltyAccountResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JsonNode finalLoyaltyAccount = parseJson(finalLoyaltyAccountResponse.getBody());
+        assertThat(finalLoyaltyAccount.get("points").asInt()).isEqualTo(0);
     }
 
     private String generateUniqueEmail() {
@@ -214,3 +338,4 @@ class Zad5EndToEndTest {
         return "http://localhost:" + port;
     }
 }
+

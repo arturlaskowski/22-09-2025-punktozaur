@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "payment-service.kafka.topics")
+@ConfigurationProperties(prefix = "loyalty-service.kafka.topics")
 public class TopicsConfigData {
     private String customerEvent;
+    private String loyaltyCommand;
 }
 

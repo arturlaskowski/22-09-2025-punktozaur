@@ -74,10 +74,12 @@ services:
       echo -e 'Deleting kafka topics'
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic customer-events --delete --if-exists
       kafka-topics --bootstrap-server kafka-broker-1:9092 --topic loyalty-commands --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic loyalty-events --delete --if-exists
       
       echo -e 'Creating kafka topics'
       kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic customer-events --replication-factor 1 --partitions 1
       kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic loyalty-commands --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic loyalty-events --replication-factor 1 --partitions 1
       
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka:29092 --list

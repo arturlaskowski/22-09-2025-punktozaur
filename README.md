@@ -1,38 +1,37 @@
-## Zadanie 5
+## Zadanie 6 
 
-Twoim zadaniem jest przesłanie wiadomości za pośrednictwem Kafki z **coupon service** do **loyalty service** podczas tworzenia kuponu, w celu odjęcia punktów.
+# Zaimplementuj wzorzec Saga dla procesu wydawania kuponu
 
-Wiadomość powinna być wysłana na topic `loyalty-commands` (topic ten jest automatycznie tworzony w [docker-compose](infrastructure/docker-compose.yml)).
+## Happy Path
 
-### Kroki do wykonania
+1. Podczas tworzenia kuponu Coupon Service wysyła komendę do odjęcia punktów.
+2. Po wysłaniu tej komendy tworzony jest kupon w statusie `PENDING`.
+3. Serwis lojalnościowy (Loyalty Service) odbiera tę komendę i ją przetwarza.
+4. Po pomyślnym odjęciu punktów, Loyalty Service wysyła event z informacją, że udało się odjąć punkty.
+5. Na ten event nasłuchuje serwis kuponów (Coupon Service) i zmienia status kuponu na `ACTIVE`.  
+   *(Od tej pory kupon może być używany.)*
 
-1. **Zdefiniuj strukturę wiadomości (schemat Avro)**
-   Umieść schemat w katalogu [src/main/resources/avro](common/src/main/resources/avro).
+## Kompensacja (nie udaje się odjąć punktów)
 
-2. **Wygeneruj klasy Java**
-   Po zdefiniowaniu schematu Avro, w module `common` wykonaj polecenie  `mvn compile` w module common.
-   Spowoduje to automatyczne wygenerowanie klas Java, które mogą być używane zarówno przez producenta, jak i odbiorcę wiadomości.
+1. Podczas tworzenia kuponu Coupon Service wysyła komendę do odjęcia punktów.
+2. Po wysłaniu tej komendy tworzony jest kupon w statusie `PENDING`.
+3. Serwis lojalnościowy (Loyalty Service) odbiera tę komendę i ją przetwarza, ale nie udaje się odjąć punktów.
+4. Loyalty Service wysyła event z informacją, że nie udało się odjąć punktów.
+5. Na ten event nasłuchuje serwis kuponów (Coupon Service) i zmienia status kuponu na `REJECTED`.  
+   *(Kupon nie będzie mógł być używany, ale powinna być dostępna informacja o przyczynie odrzucenia)*
 
-3. **Wyślij wiadomość podczas tworzenia kuponu**
-   Zaimplementuj wysyłanie wiadomości na topic `loyalty-commands` podczas tworzenia kuponu.
 
-4. **Zaktualizuj test akceptacyjny**
-   Zmodyfikuj test [CreateCouponAcceptanceTest](coupon-service/src/test/java/pl/punktozaur/coupon/acceptance/CreateCouponAcceptanceTest.java), aby weryfikował, czy wiadomość jest wysłana na Kafkę podczas tworzenia kuponu.
-   Test zamiast `BaseIntegrationTest` powinien rozszerzać `KafkaIntegrationTest`, przykład w klasie [CustomerAcceptanceTest](customer-service/src/test/java/pl/punktozaur/customer/acceptance/CustomerAcceptanceTest.java).
+Topics potrzebne do wykonania tego zadania zostały już dodane do [docker-compose](infrastructure/docker-compose.yml).
+Schematy avro zostały już stworzone [schematy avro](common/src/main/resources/avro).
+Encja [Coupon](coupon-service/src/main/java/pl/punktozaur/coupon/domain/Coupon.java) została już dostosowana i zawiera metody oraz statusy, które będą potrzebne do wykonania tego zadania.
 
-5. **Odbierz wiadomość w loyalty service**
-   W **loyalty service** zaimplementuj listener, który odbierze wiadomość z topicu `loyalty-commands` i odejmie punkty.
+Możliwość dodawania konta lojalnościowego przez REST API została usunięta, teraz jest to proces wewnętrzny podczas tworzenia customera.
+Jednak odejmowanie punktów w lojalności może odbywać się także z innych powodów niż wydawanie kuponu, więc endpoint do tego zostaje (pamiętaj o tym, projektując sagę).
 
-6. **Przetestuj swoje rozwiązanie**
-   Uruchom wszystkie mikroserwisy i wykonaj test [Zad5EndToEndTest](coupon-service/src/test/java/pl/punktozaur/coupon/Zad5EndToEndTest.java).
-   Jeśli test będzie zielony, oznacza to, że zadanie zostało wykonane poprawnie.
+Aby sprawdzić poprawność swojego Sagi, przy uruchomionych wszystkich mikroserwisach uruchom test:
+[Saga Pattern Test](coupon-service/src/test/java/pl/punktozaur/coupon/SagaEndToEndTest.java).
 
-   > Tego typu testów zazwyczaj nie pisze się w normalnych projektach – ten został przygotowany wyłącznie w celu weryfikacji poprawności rozwiązania.
-
-   Jeśli chcesz samodzielnie sprawdzić działanie aplikacji przez API, możesz skorzystać z [kolekcji Postmana](punktozaur-2.postman_collection.json).
-
----
-
+Powodzenia! 
 ### Wskazówki
 
 * **Zatrzymaj niepotrzebne kontenery Dockera z projektu Kopytka**
@@ -55,9 +54,3 @@ Aby go uruchomić, skorzystaj z pliku [docker-compose.pgadmin.yml](infrastructur
 
 Po około minucie pgAdmin będzie dostępny pod adresem:
 [http://localhost:5050](http://localhost:5050)
-
-Baza danych **punktozaurDb** powinna być już skonfigurowana.
-Jeśli pojawi się okno z prośbą o hasło lub dane logowania, wpisz `postgres`.
-
-### Czyszczenie danych
-  Jeśli chcesz wyczyścić dane z bazy, usunąć topiki z Kafki i zatrzymać wszystkie kontenery Dockera, użyj skryptu [docker-clean.sh](infrastructure/docker-clean.sh).
