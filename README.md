@@ -1,31 +1,30 @@
-## Zadanie: Wdrożenie CQRS podejścia command-handler z wykorzystaniem wzorca Mediator w domenie **Coupon**
+## Zadanie 4
 
-### Cel
+Wykorzystaj mechanizm messagingu wbudowany w Spring (`ApplicationEventPublisher`) (jest to messaging, który domyślnie opiera się na pamięci aplikacji, domyślnie działa synchronicznie. Dzięki adnotacji `@Async` można zmienić na podejście asynchroniczne, ale zrobimy to w kolejnym zadaniu z użyciem brokera wiadomości).
 
-Zaimplementuj architektoniczny wzorzec **CQRS** w domenie `Coupon`, wykorzystując wzorzec **Mediator** w taki sposób, aby:
-* [CouponController](src/main/java/pl/punktozaur/coupon/web/CouponController.java) tworzył **komendy (command)** i przesyłał je do **Mediatora**,
-* **Mediator** przekazywał komendy do odpowiednich **Command Handlerów**.
+Zadbaj, aby wszystkie moduły były luźno powiązane (bezpośdenio z sobą nie rozmaiwały).
+Zostanie to zweryfikowane przez [Testy Architektoniczne](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java).
 
-Przykładową implementację znajdziesz w projekcie `kopytka`, na branchu `cqrs-command-handler`.
+Zastąp obecną implementację messagingiem.
+Klasy `...Facade` powinny zostać usunięte. 
 
----
+Po utworzeniu Customera nadal powinno być tworzone konto lojalnościowe, a przy tworzeniu kuponu powinny być odejmowane punkty z konta lojalnościowego.
+Obserwowalne zachowanie aplikacji się nie zmienia.
 
-### Obecny stan
+Zostanie to zweryfikowane przez [Testy End to End](src/test/java/pl/punktozaur/CreateCouponEndToEndTest.java).
 
-W projekcie istnieje już wstępna implementacja CQRS:
-* [CouponService](src/main/java/pl/punktozaur/coupon/application/CouponService.java) odpowiada za operacje **zmieniające stan**,
-* [CouponQueryService](src/main/java/pl/punktozaur/coupon/application/CouponQueryService.java) odpowiada za **operacje odczytu**.
 
-Twoim zadaniem jest **przeniesienie logiki modyfikującej stan** z `CouponService` do dedykowanych **Command Handlerów** i zmiany podejścia w kontrolerze.
+W konfiguracji testów akceptacyjnych zamiast stubowania fasady, zastąp ją stubem dla `ApplicationEventPublisher`.
+```java
+@TestConfiguration
+class CustomerTestConfig {
 
-### Wskazówki
-* W projekcie znajdują się już klasy wspierające Mediatora w pakiecie [common.command](src/main/java/pl/punktozaur/common/command).
-* Po wprowadzeniu zmian, `CouponService` powinien być **usunięty** z projektu.
-* W testach architektury ([ArchitectureTest](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java)) weryfikowana jest reguła, że `CouponController` **nie może zależeć od `CouponService`**.
-* Zachowanie aplikacji (request/response) **nie powinno się zmienić** po refaktoryzacji.
-* W testach może być konieczne:
-    * dostosowanie DTO wykorzystywanych w metodach pomocniczych,
-    * zamiana wywołań serwisów na wywołania handlerów.
-
-**Powodzenia!**
-
+    @Bean
+    @Primary
+    public ApplicationEventPublisher applicationEventPublisher() {
+        ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+        doNothing().when(publisher).publishEvent(CustomerCreatedEvent.class);
+        return publisher;
+    }
+}
+```
