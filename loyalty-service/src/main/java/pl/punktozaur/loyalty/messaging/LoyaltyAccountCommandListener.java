@@ -9,10 +9,8 @@ import org.springframework.stereotype.Component;
 import pl.punktozaur.avro.loyalty.AddPointsAvroCommand;
 import pl.punktozaur.avro.loyalty.LoyaltyAccountCommandAvroModel;
 import pl.punktozaur.avro.loyalty.SubtractPointsAvroCommand;
-import pl.punktozaur.common.domain.LoyaltyAccountId;
-import pl.punktozaur.common.domain.LoyaltyPoints;
 import pl.punktozaur.common.kafka.consumer.AbstractKafkaConsumer;
-import pl.punktozaur.loyalty.application.LoyaltyAccountService;
+import pl.punktozaur.loyalty.application.exception.LoyaltyAccountNotFoundException;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ import static org.springframework.kafka.support.KafkaHeaders.*;
 @RequiredArgsConstructor
 class LoyaltyAccountCommandListener extends AbstractKafkaConsumer<LoyaltyAccountCommandAvroModel> {
 
-    private final LoyaltyAccountService loyaltyAccountService;
+    private final LoyaltyMessageHandler loyaltyMessageHandler;
 
     @Override
     @KafkaListener(id = "LoyaltyCommandListener",
@@ -38,23 +36,16 @@ class LoyaltyAccountCommandListener extends AbstractKafkaConsumer<LoyaltyAccount
 
     @Override
     protected void processMessage(LoyaltyAccountCommandAvroModel command) {
-        switch (command.getType()) {
-            case ADD_POINTS -> handle((AddPointsAvroCommand) command.getPayload());
-            case SUBTRACT_POINTS -> handle((SubtractPointsAvroCommand) command.getPayload());
-            default -> log.warn("Unknown payment command type: {}", command.getType());
+        try {
+            switch (command.getType()) {
+                case ADD_POINTS -> loyaltyMessageHandler.handle((AddPointsAvroCommand) command.getPayload());
+                case SUBTRACT_POINTS -> loyaltyMessageHandler.handle((SubtractPointsAvroCommand) command.getPayload());
+                default -> log.warn("Unknown payment command type: {}", command.getType());
+            }
+        }catch (LoyaltyAccountNotFoundException e){
+            log.info("Do nothing");
         }
-    }
 
-    public void handle(SubtractPointsAvroCommand command) {
-        var loyaltyPoints = new LoyaltyPoints(command.getPoints());
-        var loyaltyAccountId = new LoyaltyAccountId(command.getLoyaltyAccountId());
-        loyaltyAccountService.subtractPoints(loyaltyAccountId, loyaltyPoints);
-    }
-
-    public void handle(AddPointsAvroCommand command) {
-        var loyaltyPoints = new LoyaltyPoints(command.getPoints());
-        var loyaltyAccountId = new LoyaltyAccountId(command.getLoyaltyAccountId());
-        loyaltyAccountService.addPoints(loyaltyAccountId, loyaltyPoints);
     }
 
     @Override

@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
 public class TopicsConfigData {
     private String customerEvent;
     private String loyaltyCommand;
+    private String loyaltyEvent;
 }
-

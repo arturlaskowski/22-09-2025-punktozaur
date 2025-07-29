@@ -9,4 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "coupon-service.kafka.topics")
 public class TopicsConfigData {
     private String loyaltyCommand;
+    private String loyaltyEvent;
 }

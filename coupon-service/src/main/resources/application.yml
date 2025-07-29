@@ -24,6 +24,7 @@ coupon-service:
     group-id: coupon-topic-consumer
     topics:
       loyalty-command: loyalty-commands
+      loyalty-event: loyalty-events
 
 kafka-config:
   bootstrap-servers: localhost:9092
