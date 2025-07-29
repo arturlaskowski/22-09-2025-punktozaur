@@ -1,0 +1,27 @@
+version: '3.8'
+
+#Opcjonalnie jeśli chcesz użyć pgAdmin do zarządzania bazą danych PostgreSQL
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - punktozaur_pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    networks:
+      - shared-punktozaur-db-network
+
+networks:
+  shared-punktozaur-db-network:
+    external: true
+
+volumes:
+  punktozaur_pgadmin_data:
