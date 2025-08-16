@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1777dd9d-603c-42f3-9b03-6e4dea60f4de",
+		"_postman_id": "c7f8c719-0080-47c1-b4cf-41cd8c2da1b5",
 		"name": "Punktozaur-1",
 		"description": "Postman collection for all endpoints in the Punktozaur microservices application.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -20,7 +20,7 @@
 									"var responseHeader = pm.response.headers.get('Location');",
 									"if (responseHeader) {",
 									"    var couponId = responseHeader.split('/').pop();",
-									"    pm.environment.set(\"couponId\", couponId);",
+									"    pm.collectionVariables.set(\"couponId\", couponId);",
 									"}",
 									""
 								],
@@ -113,7 +113,7 @@
 									"var responseHeader = pm.response.headers.get('Location');",
 									"if (responseHeader) {",
 									"    var loyaltyAccountId = responseHeader.split('/').pop();",
-									"    pm.environment.set(\"loyaltyAccountId\", loyaltyAccountId);",
+									"    pm.collectionVariables.set(\"loyaltyAccountId\", loyaltyAccountId);",
 									"}",
 									""
 								],
@@ -131,7 +131,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"customerId\": \"123e4567-e89b-12d3-a456-426614174000\"\n}"
+							"raw": "{\n  \"customerId\": \"123e4567-e89b-12d3-a456-426614174001\"\n}"
 						},
 						"url": {
 							"raw": "{{punktozur_url}}/loyalty-accounts",
