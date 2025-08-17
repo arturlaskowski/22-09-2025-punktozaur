@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import pl.punktozaur.coupon.application.exception.LoyaltyPointsSubtractionException;
+import pl.punktozaur.coupon.application.exception.PointsNotSubtractedException;
 import pl.punktozaur.domain.LoyaltyAccountId;
 import pl.punktozaur.domain.LoyaltyPoints;
+import pl.punktozaur.web.ServiceUnavailableException;
 
 @Component
 @RequiredArgsConstructor
@@ -17,36 +18,34 @@ public class LoyaltyServiceClient {
     private final LoyaltyServiceFeignClient loyaltyServiceFeignClient;
 
     public void subtractPoints(LoyaltyAccountId accountId, LoyaltyPoints pointsToSubtract) {
-        log.info("Attempting to subtract {} points from loyalty account: {}", pointsToSubtract.points(), accountId.id());
-
         try {
+            log.info("Attempting to subtract {} points from loyalty account: {}",
+                    pointsToSubtract.points(), accountId.id());
+
             SubtractPointsRequest request = new SubtractPointsRequest(pointsToSubtract.points());
             loyaltyServiceFeignClient.subtractPoints(accountId.id(), request);
 
-            log.info("Successfully subtracted {} points from loyalty account: {}", pointsToSubtract.points(), accountId.id());
+            log.info("Successfully subtracted {} points from loyalty account: {}",
+                    pointsToSubtract.points(), accountId.id());
+
         } catch (FeignException e) {
-            HttpStatus httpStatus = HttpStatus.resolve(e.status());
+            log.error("Points subtraction failed with status: {}, message: {}", e.status(), e.getMessage());
 
-            LoyaltyPointsSubtractionException.Reason reason = resolveReason(httpStatus);
-            log.warn("Failed to subtract points from loyalty account: {}. Reason: {}, HTTP status: {}", accountId.id(), reason, httpStatus);
+            // If status is 5xx - loyalty service issue
+            if (HttpStatus.Series.valueOf(e.status()) == HttpStatus.Series.SERVER_ERROR) {
+                throw new ServiceUnavailableException("Loyalty", "subtracting points", e);
+            }
 
-            throw new LoyaltyPointsSubtractionException(accountId, reason);
+            // For all other non-200 status codes - points subtraction issue
+            throw new PointsNotSubtractedException(accountId);
+
         } catch (Exception e) {
-            log.error("Unexpected error while subtracting points from loyalty account: {}", accountId.id(), e);
+            if (e instanceof PointsNotSubtractedException || e instanceof ServiceUnavailableException) {
+                throw e;
+            }
 
-            throw new LoyaltyPointsSubtractionException(accountId, LoyaltyPointsSubtractionException.Reason.UNKNOWN);
+            log.error("Unexpected error while subtracting points: {}", e.getMessage(), e);
+            throw new ServiceUnavailableException("Loyalty", "subtracting points", e);
         }
-    }
-
-    private LoyaltyPointsSubtractionException.Reason resolveReason(HttpStatus status) {
-        if (status == null) {
-            return LoyaltyPointsSubtractionException.Reason.UNKNOWN;
-        }
-
-        return switch (status.series()) {
-            case CLIENT_ERROR -> LoyaltyPointsSubtractionException.Reason.CLIENT_ERROR;
-            case SERVER_ERROR -> LoyaltyPointsSubtractionException.Reason.SERVER_ERROR;
-            default -> LoyaltyPointsSubtractionException.Reason.UNKNOWN;
-        };
     }
 }
