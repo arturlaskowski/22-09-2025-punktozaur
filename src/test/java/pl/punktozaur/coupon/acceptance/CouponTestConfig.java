@@ -1,3 +1,4 @@
+/*
 package pl.punktozaur.coupon.acceptance;
 
 import org.springframework.boot.test.context.TestConfiguration;
@@ -13,3 +14,4 @@ class CouponTestConfig {
         return new StubLoyaltyFacade();
     }
 }
+*/

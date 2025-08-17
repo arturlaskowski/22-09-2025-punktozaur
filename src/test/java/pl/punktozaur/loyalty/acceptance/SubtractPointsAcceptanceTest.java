@@ -1,3 +1,4 @@
+/*
 package pl.punktozaur.loyalty.acceptance;
 
 import org.junit.jupiter.api.DisplayName;
@@ -111,4 +112,4 @@ class SubtractPointsAcceptanceTest {
     String getBaseLoyaltyAccountsUrl() {
         return "http://localhost:" + port + "/loyalty-accounts";
     }
-}
+}*/

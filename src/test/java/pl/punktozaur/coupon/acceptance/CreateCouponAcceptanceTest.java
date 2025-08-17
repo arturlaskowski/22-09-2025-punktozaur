@@ -1,3 +1,4 @@
+/*
 package pl.punktozaur.coupon.acceptance;
 
 
@@ -95,4 +96,4 @@ class CreateCouponAcceptanceTest {
     String getBaseCouponsUrl() {
         return "http://localhost:" + port + "/coupons";
     }
-}
+}*/

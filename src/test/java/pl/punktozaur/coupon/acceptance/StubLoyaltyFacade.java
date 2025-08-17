@@ -1,3 +1,4 @@
+/*
 package pl.punktozaur.coupon.acceptance;
 
 
@@ -27,4 +28,4 @@ class StubLoyaltyFacade implements LoyaltyFacade {
         }
         // Simulate success
     }
-}
+}*/

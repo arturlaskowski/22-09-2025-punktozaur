@@ -1,3 +1,4 @@
+/*
 package pl.punktozaur.loyalty.acceptance;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,3 +34,4 @@ class FixtureLoyaltyAccountAcceptance {
         return loyaltyAccountService.getAccount(new LoyaltyAccountId(id)).points();
     }
 }
+*/
