@@ -9,10 +9,11 @@ import pl.punktozaur.customer.application.exception.CustomerAlreadyExistsExcepti
 import pl.punktozaur.customer.application.exception.CustomerNotFoundException;
 import pl.punktozaur.customer.application.exception.LoyaltyAccountCreationException;
 import pl.punktozaur.web.ApiErrorResponse;
+import pl.punktozaur.web.GlobalRestApiExceptionHandler;
 
 @RestControllerAdvice
 @Slf4j
-public class CustomerExceptionHandler {
+public class CustomerExceptionHandler extends GlobalRestApiExceptionHandler {
 
     @ExceptionHandler(value = CustomerNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleException(CustomerNotFoundException ex) {
