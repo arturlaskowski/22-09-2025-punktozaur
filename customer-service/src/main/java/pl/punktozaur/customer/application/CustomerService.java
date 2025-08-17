@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.punktozaur.common.domain.CustomerId;
 import pl.punktozaur.customer.application.dto.CreateCustomerDto;
 import pl.punktozaur.customer.application.dto.CustomerDto;
 import pl.punktozaur.customer.application.exception.CustomerAlreadyExistsException;
 import pl.punktozaur.customer.application.exception.CustomerNotFoundException;
 import pl.punktozaur.customer.domain.Customer;
+import pl.punktozaur.customer.domain.CustomerEventPublisher;
 import pl.punktozaur.customer.domain.event.CustomerCreatedEvent;
-import pl.punktozaur.customer.messaging.CustomerCreatedEventPublisher;
-import pl.punktozaur.common.domain.CustomerId;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final CustomerCreatedEventPublisher customerCreatedEventPublisher;
+    private final CustomerEventPublisher customerEventPublisher;
 
     public CustomerDto getCustomer(UUID id) {
         CustomerId customerId = new CustomerId(id);
@@ -40,7 +40,7 @@ public class CustomerService {
         CustomerId customerId = customerRepository.save(customer).getCustomerId();
 
         var customerCreatedEvent = new CustomerCreatedEvent(customer);
-        customerCreatedEventPublisher.publish(customerCreatedEvent);
+        customerEventPublisher.publish(customerCreatedEvent);
 
         return customerId;
     }
