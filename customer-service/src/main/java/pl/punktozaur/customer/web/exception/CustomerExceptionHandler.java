@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.punktozaur.customer.application.exception.CustomerAlreadyExistsException;
 import pl.punktozaur.customer.application.exception.CustomerNotFoundException;
 import pl.punktozaur.web.ApiErrorResponse;
+import pl.punktozaur.web.GlobalRestApiExceptionHandler;
 
 @RestControllerAdvice
 @Slf4j
-public class CustomerExceptionHandler {
+public class CustomerExceptionHandler extends GlobalRestApiExceptionHandler {
 
 
     @ExceptionHandler(value = CustomerNotFoundException.class)
