@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "c7f8c719-0080-47c1-b4cf-41cd8c2da1b5",
-		"name": "Punktozaur-1",
+		"name": "Punktozaur-3",
 		"description": "Postman collection for all endpoints in the Punktozaur microservices application.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "5840429"
@@ -104,48 +104,6 @@
 			"name": "loyalty",
 			"item": [
 				{
-					"name": "Loyalty Service - Create Loyalty Account",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var responseHeader = pm.response.headers.get('Location');",
-									"if (responseHeader) {",
-									"    var loyaltyAccountId = responseHeader.split('/').pop();",
-									"    pm.collectionVariables.set(\"loyaltyAccountId\", loyaltyAccountId);",
-									"}",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"customerId\": \"123e4567-e89b-12d3-a456-426614174001\"\n}"
-						},
-						"url": {
-							"raw": "{{punktozur_url}}/loyalty-accounts",
-							"host": [
-								"{{punktozur_url}}"
-							],
-							"path": [
-								"loyalty-accounts"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Loyalty Service - Add Points",
 					"request": {
 						"method": "POST",
@@ -221,11 +179,25 @@
 				},
 				{
 					"name": "Loyalty Service - Get Loyalty Accounts by Customer Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json(); ",
+									"let loyaltyId = response[0].id;  ",
+									"pm.collectionVariables.set(\"loyaltyAccountId\", loyaltyId);  ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{punktozur_url}}/loyalty-accounts?customerId=123e4567-e89b-12d3-a456-426614174000",
+							"raw": "{{punktozur_url}}/loyalty-accounts?customerId={{customerId}}",
 							"host": [
 								"{{punktozur_url}}"
 							],
@@ -235,8 +207,73 @@
 							"query": [
 								{
 									"key": "customerId",
-									"value": "123e4567-e89b-12d3-a456-426614174000"
+									"value": "{{customerId}}"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "customer",
+			"item": [
+				{
+					"name": "Customer Service - Get Customer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{punktozur_url}}/customers/{{customerId}}",
+							"host": [
+								"{{punktozur_url}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer Service - Add Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseHeader = pm.response.headers.get('Location');",
+									"if (responseHeader) {",
+									"    var customerId = responseHeader.split('/').pop();",
+									"    pm.collectionVariables.set(\"customerId\", customerId);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jan\",\n  \"lastName\": \"Kowalski\",\n  \"email\": \"jan.ksowalski@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{punktozur_url}}/customers",
+							"host": [
+								"{{punktozur_url}}"
+							],
+							"path": [
+								"customers"
 							]
 						}
 					},
@@ -277,6 +314,11 @@
 		{
 			"key": "couponId",
 			"value": "123e4567-e89b-12d3-a456-426614174002"
+		},
+		{
+			"key": "customerId",
+			"value": "123e4567-e89b-12d3-a456-426614174002",
+			"type": "string"
 		}
 	]
 }
