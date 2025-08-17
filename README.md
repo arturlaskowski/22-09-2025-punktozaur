@@ -1,20 +1,22 @@
 ## Zadanie 4
 
-Wykorzystaj mechanizm messagingu wbudowany w Spring (`ApplicationEventPublisher`) (jest to messaging, który domyślnie opiera się na pamięci aplikacji, domyślnie działa synchronicznie. Dzięki adnotacji `@Async` można zmienić na podejście asynchroniczne, ale zrobimy to w kolejnym zadaniu z użyciem brokera wiadomości).
+Wykorzystaj mechanizm messagingu wbudowany w Spring (`ApplicationEventPublisher`).  
+Jest to messaging, który domyślnie opiera się na pamięci aplikacji i działa synchronicznie.
 
-Zadbaj, aby wszystkie moduły były luźno powiązane (bezpośdenio z sobą nie rozmaiwały).
+Zadbaj, aby wszystkie moduły były luźno powiązane (nie komunikowały się bezpośrednio ze sobą).  
 Zostanie to zweryfikowane przez [Testy Architektoniczne](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java).
 
-Zastąp obecną implementację messagingiem.
-Klasy `...Facade` powinny zostać usunięte. 
+Zastąp obecną implementację messagingiem.  
+Klasy `...Facade` powinny zostać usunięte.
 
-Po utworzeniu Customera nadal powinno być tworzone konto lojalnościowe, a przy tworzeniu kuponu powinny być odejmowane punkty z konta lojalnościowego.
-Obserwowalne zachowanie aplikacji się nie zmienia.
+Po utworzeniu klienta (Customer) nadal powinno być tworzone konto lojalnościowe,  
+a przy tworzeniu kuponu powinny być odejmowane punkty z konta lojalnościowego.  
+Obserwowalne zachowanie aplikacji nie powinno ulec zmianie.
 
-Zostanie to zweryfikowane przez [Testy End to End](src/test/java/pl/punktozaur/CreateCouponEndToEndTest.java).
+Zostanie to zweryfikowane przez [Testy End-to-End](src/test/java/pl/punktozaur/CreateCouponEndToEndTest.java).
 
+W konfiguracji testów akceptacyjnych, zamiast stubowania fasady, zastąp ją stubem dla `ApplicationEventPublisher`, np.:
 
-W konfiguracji testów akceptacyjnych zamiast stubowania fasady, zastąp ją stubem dla `ApplicationEventPublisher`.
 ```java
 @TestConfiguration
 class CustomerTestConfig {
