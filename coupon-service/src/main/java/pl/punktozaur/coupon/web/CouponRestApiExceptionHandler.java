@@ -11,9 +11,10 @@ import pl.punktozaur.coupon.application.exception.PointsNotSubtractedException;
 import pl.punktozaur.coupon.domain.exception.CouponNotActiveException;
 import pl.punktozaur.coupon.domain.exception.UnauthorizedCouponAccessException;
 import pl.punktozaur.web.ApiErrorResponse;
+import pl.punktozaur.web.GlobalRestApiExceptionHandler;
 
 @RestControllerAdvice
-public class CouponRestApiExceptionHandler {
+public class CouponRestApiExceptionHandler extends GlobalRestApiExceptionHandler {
 
     @ExceptionHandler(value = CouponNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleException(CouponNotFoundException ex) {

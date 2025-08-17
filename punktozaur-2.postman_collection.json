@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3f0e7dc7-06d7-45ee-b68e-b85240c765b1",
+		"_postman_id": "1cdc7f94-8b64-40b3-811a-f73ff555191a",
 		"name": "Punktozaur-2",
 		"description": "Postman collection for all endpoints in the Punktozaur microservices application.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -38,7 +38,7 @@
 									"var responseHeader = pm.response.headers.get('Location');",
 									"if (responseHeader) {",
 									"    var customerId = responseHeader.split('/').pop();",
-									"    pm.environment.set(\"customerId\", customerId);",
+									"    pm.collectionVariables.set(\"customerId\", customerId);",
 									"}",
 									""
 								],
@@ -56,7 +56,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Jan\",\n  \"lastName\": \"Kowalski\",\n  \"email\": \"jan.kowalski@example.com\"\n}"
+							"raw": "{\n  \"firstName\": \"Jan\",\n  \"lastName\": \"Kowalski\",\n  \"email\": \"jan.ksowalski@example.com\"\n}"
 						},
 						"url": {
 							"raw": "{{customer_service_url}}/customers",
@@ -153,32 +153,6 @@
 			"name": "loyalty",
 			"item": [
 				{
-					"name": "Loyalty Service - Create Loyalty Account",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"customerId\": \"123e4567-e89b-12d3-a456-426614174000\"\n}"
-						},
-						"url": {
-							"raw": "{{loyalty_service_url}}/loyalty-accounts",
-							"host": [
-								"{{loyalty_service_url}}"
-							],
-							"path": [
-								"loyalty-accounts"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Loyalty Service - Add Points",
 					"request": {
 						"method": "POST",
@@ -254,11 +228,25 @@
 				},
 				{
 					"name": "Loyalty Service - Get Loyalty Accounts by Customer Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json(); ",
+									"let loyaltyId = response[0].id;  ",
+									"pm.collectionVariables.set(\"loyaltyAccountId\", loyaltyId);  ",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{loyalty_service_url}}/loyalty-accounts?customerId",
+							"raw": "{{loyalty_service_url}}/loyalty-accounts?customerId={{customerId}}",
 							"host": [
 								"{{loyalty_service_url}}"
 							],
@@ -268,7 +256,7 @@
 							"query": [
 								{
 									"key": "customerId",
-									"value": ""
+									"value": "{{customerId}}"
 								}
 							]
 						}

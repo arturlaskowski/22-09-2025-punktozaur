@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.punktozaur.loyalty.application.exception.InsufficientPointsException;
 import pl.punktozaur.loyalty.application.exception.LoyaltyAccountNotFoundException;
 import pl.punktozaur.web.ApiErrorResponse;
+import pl.punktozaur.web.GlobalRestApiExceptionHandler;
 
 @RestControllerAdvice
-public class LoyaltyRestApiExceptionHandler {
+public class LoyaltyRestApiExceptionHandler extends GlobalRestApiExceptionHandler {
 
     @ExceptionHandler(value = LoyaltyAccountNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleException(LoyaltyAccountNotFoundException ex) {
