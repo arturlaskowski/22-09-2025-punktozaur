@@ -1,3 +1,4 @@
+# Rozwiązanie 
 ## Zadanie: Wdrożenie podejścia CQRS z command-handler przy użyciu wzorca Mediator w module **Coupon**
 
 ### Cel
@@ -22,7 +23,6 @@ Twoim zadaniem jest **przeniesienie logiki modyfikującej stan** z `CouponServic
 * W projekcie znajdują się już klasy wspierające Mediatora w pakiecie [common.command](src/main/java/pl/punktozaur/common/command).
 * Po wprowadzeniu zmian `CouponService` powinien zostać **usunięty** z projektu.
 * W testach architektury ([ArchitectureTest](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java)) weryfikowana jest reguła, że `CouponController` **nie może zależeć od `CouponService`**.
-* Po wprowadzeniu zmian [LoyaltyFacade](src/main/java/pl/punktozaur/loyalty/application/LoyaltyFacade.java) może zostać usunięty z projektu.
 * Zachowanie aplikacji (request/response) **nie powinno się zmienić** po refaktoryzacji. Test [end to end](src/test/java/pl/punktozaur/CreateCouponEndToEndTest.java) sprawdza to automatycznie.
 * Testy akceptacyjne zostały tymczasowo zakomentowane. Jeśli przejdzie test [end to end](src/test/java/pl/punktozaur/CreateCouponEndToEndTest.java) oraz [ArchitectureTest](src/test/java/pl/punktozaur/architecture/ArchitectureTest.java), zadanie można uznać za zakończone (ręka do góry - online).
 * Jeśli inni jeszcze pracują a tobie zostało czasu warto również dostosować testy akceptacyjne (oczywiście w rozwiązaniu będą dostosowane) :).
