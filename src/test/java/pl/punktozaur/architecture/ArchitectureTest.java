@@ -12,7 +12,17 @@ class ArchitectureTest {
     private final JavaClasses classes = new ClassFileImporter().importPackages(BASE_PACKAGE);
 
     @Test
-    void checkModuleDependencies() {
+    void checkCustomerLoyaltyModuleDependencies() {
+        layeredArchitecture().consideringOnlyDependenciesInLayers()
+                .layer("customer").definedBy("pl.punktozaur.customer..")
+                .layer("loyalty").definedBy("pl.punktozaur.loyalty..")
+                .whereLayer("customer").mayNotAccessAnyLayer()
+                .whereLayer("loyalty").mayNotAccessAnyLayer()
+                .check(classes);
+    }
+
+    @Test
+    void checkAllModuleDependencies() {
         layeredArchitecture().consideringOnlyDependenciesInLayers()
                 .layer("customer").definedBy("pl.punktozaur.customer..")
                 .layer("loyalty").definedBy("pl.punktozaur.loyalty..")
