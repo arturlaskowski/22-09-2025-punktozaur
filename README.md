@@ -6,26 +6,31 @@ Wiadomość powinna być wysłana na topic `loyalty-commands` (topic ten jest au
 
 ### Kroki do wykonania
 
-1. **Zdefiniuj strukturę wiadomości (schemat Avro)**
+1. **Zdefiniuj strukturę wiadomości (schemat Avro)**  
    Umieść schemat w katalogu [src/main/resources/avro](common/src/main/resources/avro).
 
-2. **Wygeneruj klasy Java**
-   Po zdefiniowaniu schematu Avro, w module `common` wykonaj polecenie  `mvn compile` w module common.
+2. **Wygeneruj klasy Java**  
+   Po zdefiniowaniu schematu Avro, w module `common` wykonaj polecenie `mvn compile`.  
    Spowoduje to automatyczne wygenerowanie klas Java, które mogą być używane zarówno przez producenta, jak i odbiorcę wiadomości.
 
-3. **Wyślij wiadomość podczas tworzenia kuponu**
-   Zaimplementuj wysyłanie wiadomości na topic `loyalty-commands` podczas tworzenia kuponu.
+3. **Wyślij wiadomość podczas tworzenia kuponu**  
+   Zaimplementuj wysyłanie wiadomości na topic `loyalty-commands` podczas tworzenia kuponu.  
+   Przykład podobnej implementacji znajdziesz na branchu `eda-start` w projekcie **Kopytka** w klasie `OrderApplicationService#payOrder`.
 
-4. **Zaktualizuj test akceptacyjny**
-   Zmodyfikuj test [CreateCouponAcceptanceTest](coupon-service/src/test/java/pl/punktozaur/coupon/acceptance/CreateCouponAcceptanceTest.java), aby weryfikował, czy wiadomość jest wysłana na Kafkę podczas tworzenia kuponu.
-   Test zamiast `BaseIntegrationTest` powinien rozszerzać `KafkaIntegrationTest`, przykład w klasie [CustomerAcceptanceTest](customer-service/src/test/java/pl/punktozaur/customer/acceptance/CustomerAcceptanceTest.java).
+   > W tym projekcie nazwy topiców są parametryzowane – po stronie **producenta** i **konsumenta** należy dodać odpowiednie parametry konfiguracyjne z nazwą tego topicu.
 
-5. **Odbierz wiadomość w loyalty service**
+4. **Odbierz wiadomość w loyalty service**  
    W **loyalty service** zaimplementuj listener, który odbierze wiadomość z topicu `loyalty-commands` i odejmie punkty.
 
-6. **Przetestuj swoje rozwiązanie**
-   Uruchom wszystkie mikroserwisy i wykonaj test [Zad5EndToEndTest](coupon-service/src/test/java/pl/punktozaur/coupon/Zad5EndToEndTest.java).
+5. **Przetestuj swoje rozwiązanie**  
+   Uruchom wszystkie mikroserwisy i wykonaj test [Zad5EndToEndTest](coupon-service/src/test/java/pl/punktozaur/coupon/Zad5EndToEndTest.java).  
    Jeśli test będzie zielony, oznacza to, że zadanie zostało wykonane poprawnie.
+
+6. **Zaktualizuj test akceptacyjny (opcjonalne)**  
+   To nie jest kluczowe w tym zadaniu. Jeśli test [Zad5EndToEndTest](coupon-service/src/test/java/pl/punktozaur/coupon/Zad5EndToEndTest.java) przechodzi, podnieś rękę (online) i możesz kontynuować dalszą pracę nad tym punktem.  
+   Zmodyfikuj test [CreateCouponAcceptanceTest](coupon-service/src/test/java/pl/punktozaur/coupon/acceptance/CreateCouponAcceptanceTest.java), aby weryfikował, czy wiadomość jest wysyłana na Kafkę podczas tworzenia kuponu.  
+   Test zamiast `BaseIntegrationTest` powinien rozszerzać `KafkaIntegrationTest` (przykład w klasie [CustomerAcceptanceTest](customer-service/src/test/java/pl/punktozaur/customer/acceptance/CustomerAcceptanceTest.java)).
+
 
    > Tego typu testów zazwyczaj nie pisze się w normalnych projektach – ten został przygotowany wyłącznie w celu weryfikacji poprawności rozwiązania.
 
